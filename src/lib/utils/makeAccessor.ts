@@ -49,3 +49,35 @@ export type KeysWithValueMatchingType<T, Match> = keyof T & (T extends Match[]
 	: T extends Record<any, unknown>
 	? { [K in keyof T]: T[K] extends Match ? K : never }[keyof T]
 	: never);
+
+const data = [[0, 3840], [0, 1600], [0, 640], [0, 320]]
+const dataBis = [{ x: 0, y: 3840 }, { x: 0, y: 1600 }, { x: 0, y: 640 }, { x: 0, y: 320 }]
+const data2 = [0, 3840]
+const data2bis = [{ a: 0 }, { b: 3840 }]
+const data2tres = [{ a: 0 }, { b: 3840 }]
+const data3 = { x: 0, y: 3840 }
+
+type A = Accessor<typeof data>
+type Abis = Accessor<typeof dataBis>
+type B = Accessor<typeof data2>
+type C = Accessor<typeof data3>
+
+const a1: A = [0, 1]
+const a2: A = [(d) => d[1], (d) => d[0]]
+const a3: A = [0, (d) => d[0]]
+const aBis1: Abis = ["x", "y"]
+const aBis2: Abis = [(d) => d.x, (d) => d.y]
+
+const b1: B = 0;
+const b2: B = (d) => d[1];
+
+const c1: C = 'x';
+const c2: C = (d) => d.x;
+
+let val: number
+
+val = data2[b1]
+val = b2(data2)
+
+val = data3[c1]
+val = c2(data3)
