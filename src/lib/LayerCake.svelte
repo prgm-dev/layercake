@@ -6,14 +6,14 @@
 	import { setContext, onMount } from 'svelte';
 	import { writable, derived } from 'svelte/store';
 
-	import makeAccessor from './utils/makeAccessor.js';
+	import makeAccessor from './utils/makeAccessor';
 	import filterObject from './utils/filterObject.js';
 	import calcScaleExtents from './helpers/calcScaleExtents.js';
 	import calcDomain from './helpers/calcDomain.js';
-	import createScale from './helpers/createScale.js';
-	import createGetter from './helpers/createGetter.js';
+	import createScale from './helpers/createScale';
+	import createGetter from './helpers/createGetter';
 	import getRange from './helpers/getRange.js';
-	import defaultScales from './settings/defaultScales.js';
+	import defaultScales from './settings/defaultScales';
 	import type { LayerCakeConfig } from './config.js';
 	import type { LayerCakeContext } from './context.js';
 
