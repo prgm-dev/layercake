@@ -3,8 +3,9 @@
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:18",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"updateContentCommand": "npm install",
+	"onCreateCommand": "corepack enable",
+	"postCreateCommand": "pnpm install && pnpm svelte-kit sync",
+	"waitFor": "postCreateCommand",
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "node",
 	"features": {
