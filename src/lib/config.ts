@@ -1,13 +1,15 @@
+import type { Axis } from "./helpers/axes"
+import type { GenericScalingFunction } from "./helpers/createScale"
 import type { Accessor, SimpleAccessor, StackedAccessor } from "./utils/makeAccessor"
 
 
-export interface LayerCakeConfig<
+export type LayerCakeConfig<
 	Datum,
-	XAccessor extends Accessor<Datum> = Accessor<Datum>,
-	YAccessor extends Accessor<Datum> = Accessor<Datum>,
-	ZAccessor extends Accessor<Datum> = Accessor<Datum>,
-	RAccessor extends Accessor<Datum> = Accessor<Datum>,
-> {
+	XAccessor extends Accessor<Datum> | null = Accessor<Datum>,
+	YAccessor extends Accessor<Datum> | null = Accessor<Datum>,
+	ZAccessor extends Accessor<Datum> | null = Accessor<Datum>,
+	RAccessor extends Accessor<Datum> | null = Accessor<Datum>,
+> = {
 	x: XAccessor
 	y: YAccessor
 	z: ZAccessor
@@ -21,7 +23,15 @@ export interface LayerCakeConfig<
 	yRange: unknown
 	zRange: unknown
 	rRange: unknown
-}
+} & {
+		/**
+		 * A scale for the axis.
+		 *
+		 * Defaults to `scaleLinear` for `x`,`y` and `z`.
+		 * Defaults to `scaleSqrt` for `r`.
+		 */
+		[axis in Axis as `${axis}Scale`]: GenericScalingFunction<number | number[]>
+	}
 
 /**
  * A helper type that constrains the {@linkcode LayerCakeConfig}

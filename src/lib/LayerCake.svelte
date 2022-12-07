@@ -3,19 +3,18 @@
 	Layer Cake component
  -->
 <script lang="ts">
-	import { setContext, onMount } from 'svelte';
-	import { writable, derived } from 'svelte/store';
+	import { onMount, setContext } from 'svelte';
+	import { derived, writable } from 'svelte/store';
 
-	import makeAccessor from './utils/makeAccessor';
-	import filterObject from './utils/filterObject.js';
-	import calcScaleExtents from './helpers/calcScaleExtents.js';
-	import calcDomain from './helpers/calcDomain.js';
-	import createScale from './helpers/createScale';
-	import createGetter from './helpers/createGetter';
-	import getRange from './helpers/getRange.js';
-	import defaultScales from './settings/defaultScales';
 	import type { LayerCakeConfig } from './config.js';
 	import type { LayerCakeContext } from './context.js';
+	import calcDomain from './helpers/calcDomain.js';
+	import calcScaleExtents from './helpers/calcScaleExtents.js';
+	import createGetter from './helpers/createGetter';
+	import createScale from './helpers/createScale';
+	import defaultScales from './settings/defaultScales';
+	import filterObject from './utils/filterObject.js';
+	import makeAccessor from './utils/makeAccessor';
 
 	type Data = $$Generic<readonly any[]>;
 	type Datum = Data[number];
@@ -74,29 +73,37 @@
 	 * The key in each row of data that corresponds to the x-field.
 	 * This can be a string, an accessor function, a number or an array of any combination of those types.
 	 * This property gets converted to a function when you access it through the context.
+	 *
+	 * @default An accessor that returns 0.
 	 */
-	export let x: Config['x'] | undefined = undefined;
+	export let x: Config['x'] = () => 0;
 	/**
 	 * The y accessor.
 	 * The key in each row of data that corresponds to the y-field.
 	 * This can be a string, an accessor function, a number or an array of any combination of those types.
 	 * This property gets converted to a function when you access it through the context.
+	 *
+	 * @default An accessor that returns 0.
 	 */
-	export let y: Config['y'] | undefined = undefined;
+	export let y: Config['y'] = () => 0;
 	/**
 	 * The z accessor.
 	 * The key in each row of data that corresponds to the z-field.
 	 * This can be a string, an accessor function, a number or an array of any combination of those types.
 	 * This property gets converted to a function when you access it through the context.
+	 *
+	 * @default An accessor that returns 0.
 	 */
-	export let z: Config['z'] | undefined = undefined;
+	export let z: Config['z'] = () => 0;
 	/**
 	 * The r accessor.
 	 * The key in each row of data that corresponds to the r-field.
 	 * This can be a string, an accessor function, a number or an array of any combination of those types.
 	 * This property gets converted to a function when you access it through the context.
+	 *
+	 * @default An accessor that returns 0.
 	 */
-	export let r: Config['r'] | undefined = undefined;
+	export let r: Config['r'] = () => 0;
 
 	/** If `data` is not a flat array of objects and you want to use any of the scales, set a flat version of the data via the `flatData` prop. */
 	export let data: Data | never[] = [];
@@ -126,13 +133,13 @@
 	/** @type {[leftPixels: Number, rightPixels: Number]} [rPadding] Assign a pixel value to add to the min or max of the scale. This will increase the scales domain by the scale unit equivalent of the provided pixels. */
 	export let rPadding = undefined;
 	/** @type {Function} [xScale=d3.scaleLinear] The D3 scale that should be used for the x-dimension. Pass in an instantiated D3 scale if you want to override the default or you want to extra options. */
-	export let xScale = defaultScales.x;
+	export let xScale: Config['xScale'] = defaultScales.x();
 	/** @type {Function} [yScale=d3.scaleLinear] The D3 scale that should be used for the x-dimension. Pass in an instantiated D3 scale if you want to override the default or you want to extra options. */
-	export let yScale = defaultScales.y;
+	export let yScale: Config['yScale'] = defaultScales.y();
 	/** @type {Function} [zScale=d3.scaleLinear] The D3 scale that should be used for the x-dimension. Pass in an instantiated D3 scale if you want to override the default or you want to extra options. */
-	export let zScale = defaultScales.z;
+	export let zScale: Config['zScale'] = defaultScales.z();
 	/** @type {Function} [rScale=d3.scaleSqrt] The D3 scale that should be used for the x-dimension. Pass in an instantiated D3 scale if you want to override the default or you want to extra options. */
-	export let rScale = defaultScales.r;
+	export let rScale: Config['rScale'] = defaultScales.r();
 	/** @type {[min: Number, max: Number]|Function|String[]|Number[]} [xRange] Override the default x range of `[0, width]` by setting an array or function with argument `({ width, height})` that returns an array. Setting this prop overrides `xReverse`. This can also be a list of numbers or strings for scales with discrete ranges like [scaleThreshhold](https://github.com/d3/d3-scale#threshold-scales) or [scaleQuantize](https://github.com/d3/d3-scale#quantize-scales). */
 	export let xRange = undefined;
 	/** @type {[min: Number, max: Number]|Function|String[]|Number[]} [xRange] Override the default y range of `[0, height]` by setting an array or function with argument `({ width, height})` that returns an array. Setting this prop overrides `yReverse`. This can also be a list of numbers or strings for scales with discrete ranges like [scaleThreshhold](https://github.com/d3/d3-scale#threshold-scales) or [scaleQuantize](https://github.com/d3/d3-scale#quantize-scales). */
@@ -240,10 +247,6 @@
 	$: $_data = data;
 	$: $_flatData = flatData || data;
 	$: $_padding = padding;
-	$: $_x = makeAccessor<Datum>(x);
-	$: $_y = makeAccessor<Datum>(y);
-	$: $_z = makeAccessor<Datum>(z);
-	$: $_r = makeAccessor<Datum>(r);
 	$: $_xDomain = xDomain;
 	$: $_yDomain = yDomain;
 	$: $_zDomain = zDomain;
@@ -279,7 +282,7 @@
 		x: $x || undefined,
 		y: $y || undefined,
 		z: $z || undefined,
-		r: $r || undefined
+		r: $r || undefined,
 	}));
 
 	const padding_d = derived([_padding, _containerWidth, _containerHeight], ([$padding]) => {
@@ -300,7 +303,7 @@
 					bottom,
 					left,
 					width: right - left,
-					height: bottom - top
+					height: bottom - top,
 				};
 			if (b.width <= 0 && isMounted === true) {
 				console.warn(
@@ -362,11 +365,11 @@
 			width_d,
 			height_d,
 			_xRange,
-			_percentRange
+			_percentRange,
 		],
 		createScale('x')
 	);
-	const xGet_d = derived([_x, xScale_d], createGetter);
+	const xGet_d = derived([_x, xScale_d], ([acc, scale]) => createGetter(acc, scale));
 
 	const yScale_d = derived(
 		[
@@ -379,11 +382,11 @@
 			width_d,
 			height_d,
 			_yRange,
-			_percentRange
+			_percentRange,
 		],
 		createScale('y')
 	);
-	const yGet_d = derived([_y, yScale_d], createGetter);
+	const yGet_d = derived([_y, yScale_d], ([acc, scale]) => createGetter(acc, scale));
 
 	const zScale_d = derived(
 		[
@@ -396,11 +399,11 @@
 			width_d,
 			height_d,
 			_zRange,
-			_percentRange
+			_percentRange,
 		],
 		createScale('z')
 	);
-	const zGet_d = derived([_z, zScale_d], createGetter);
+	const zGet_d = derived([_z, zScale_d], ([acc, scale]) => createGetter(acc, scale));
 
 	const rScale_d = derived(
 		[
@@ -413,16 +416,11 @@
 			width_d,
 			height_d,
 			_rRange,
-			_percentRange
+			_percentRange,
 		],
 		createScale('r')
 	);
-	const rGet_d = derived([_r, rScale_d], createGetter);
-
-	const xRange_d = derived([xScale_d], getRange);
-	const yRange_d = derived([yScale_d], getRange);
-	const zRange_d = derived([zScale_d], getRange);
-	const rRange_d = derived([rScale_d], getRange);
+	const rGet_d = derived([_r, rScale_d], ([acc, scale]) => createGetter(acc, scale));
 
 	const aspectRatio_d = derived([width_d, height_d], ([$width, $height]) => {
 		return $width / $height;
@@ -462,10 +460,6 @@
 		yDomain: yDomain_d,
 		zDomain: zDomain_d,
 		rDomain: rDomain_d,
-		xRange: xRange_d,
-		yRange: yRange_d,
-		zRange: zRange_d,
-		rRange: rRange_d,
 		config: _config,
 		xScale: xScale_d,
 		xGet: xGet_d,
@@ -474,7 +468,7 @@
 		zScale: zScale_d,
 		zGet: zGet_d,
 		rScale: rScale_d,
-		rGet: rGet_d
+		rGet: rGet_d,
 	};
 
 	$: setContext('LayerCake', context);

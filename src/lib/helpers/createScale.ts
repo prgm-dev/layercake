@@ -1,21 +1,33 @@
-import defaultScales from '../settings/defaultScales.js';
-import padScale from '../utils/padScale.js';
+import { scaleIdentity, type ScaleContinuousNumeric } from 'd3-scale';
 import getDefaultRange from '../settings/getDefaultRange.js';
+import padScale from '../utils/padScale.js';
+import type { Axis } from './axes.js';
 
-export default function createScale(s: keyof typeof defaultScales) {
-	return function scaleCreator([$scale, $extents, $domain, $padding, $nice, $reverse, $width, $height, $range, $percentScale]) {
+export default function createScale(s: Axis) {
+	return function scaleCreator([
+		$scale,
+		$extents,
+		$domain,
+		$padding,
+		$nice,
+		$reverse,
+		$width,
+		$height,
+		$range,
+		$percentScale,
+	]: [GenericScalingFunction, ...any]) {
 		if ($extents === null) {
-			return null;
+			return scaleIdentity();
 		}
 
 		const defaultRange = getDefaultRange(s, $width, $height, $reverse, $range, $percentScale);
 
-		const scale = $scale === defaultScales[s] ? $scale() : $scale.copy();
+		const scale = $scale.copy();
 
 		/* --------------------------------------------
 		 * Set the domain
 		 */
-		scale.domain($domain)
+		scale.domain($domain);
 
 		/* --------------------------------------------
 		 * Set the range of the scale to our default if
@@ -25,10 +37,7 @@ export default function createScale(s: keyof typeof defaultScales) {
 		 */
 		if (
 			!scale.interpolator ||
-			(
-				typeof scale.interpolator === 'function'
-				&& scale.interpolator().name.startsWith('identity')
-			)
+			(typeof scale.interpolator === 'function' && scale.interpolator().name.startsWith('identity'))
 		) {
 			scale.range(defaultRange);
 		}
@@ -41,10 +50,16 @@ export default function createScale(s: keyof typeof defaultScales) {
 			if (typeof scale.nice === 'function') {
 				scale.nice(typeof $nice === 'number' ? $nice : undefined);
 			} else {
-				console.error(`[Layer Cake] You set \`${s}Nice: true\` but the ${s}Scale does not have a \`.nice\` method. Ignoring...`);
+				console.error(
+					`[Layer Cake] You set \`${s}Nice: true\` but the ${s}Scale does not have a \`.nice\` method. Ignoring...`
+				);
 			}
 		}
 
 		return scale;
 	};
 }
+
+/** Describes a scaling function that returns an object of the same shape as its input. */
+export type GenericScalingFunction<V extends number | number[] = number | number[]> =
+	ScaleContinuousNumeric<V, V>;

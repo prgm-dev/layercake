@@ -1,5 +1,3 @@
-import canBeZero from './canBeZero.js';
-
 /**
 	Make an accessor from a string, number, function or an array of the combination of any.
 
@@ -8,7 +6,6 @@ import canBeZero from './canBeZero.js';
 */
 export default function makeAccessor<Datum, Acc extends Accessor<Datum> = Accessor<Datum>>(acc: Acc): Acc extends readonly any[] ? AccessorFunction<Datum, number[]> : AccessorFunction<Datum, number>;
 export default function makeAccessor<Datum, Acc extends Accessor<Datum> = Accessor<Datum>>(acc: Acc): (AccessorFunction<Datum, number> | AccessorFunction<Datum, number[]>) {
-	if (!canBeZero(acc)) return null;
 	if (Array.isArray(acc)) {
 		return d => acc.map((k) => {
 			return typeof k === 'function' ? k(d) : (d[k]);
