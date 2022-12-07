@@ -3,7 +3,6 @@ import type { LayerCakeConfig } from './config';
 import type { Axis } from './helpers/axes';
 import type createGetter from './helpers/createGetter';
 import type { GenericScalingFunction } from './helpers/createScale';
-import type getRange from './helpers/getRange';
 import type makeAccessor from './utils/makeAccessor';
 import type { Callable } from './utils/type-helpers';
 
@@ -29,7 +28,7 @@ export type LayerCakeContext<
 	 * The calculated scale for the given axis.
 	 */
 	[axis in Axis as `${axis}Scale`]: SvelteStore<
-		GenericScalingFunction | Callable<GenericScalingFunction>
+		Callable<GenericScalingFunction> & Partial<GenericScalingFunction>
 	>;
 } & {
 	/**

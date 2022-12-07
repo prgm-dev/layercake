@@ -1,9 +1,9 @@
 import type { ScaleContinuousNumeric } from 'd3-scale';
 
 /** Extract the range from a scale. */
-export default function getRange<Range>($scale: ScaleContinuousNumeric<Range, any, any>): Range[];
-export default function getRange<Range>($scale: null | undefined): null;
-export default function getRange<Range>(
+export function getRange<Range>($scale: ScaleContinuousNumeric<Range, any, any>): Range[];
+export function getRange<Range>($scale: null | undefined): null;
+export function getRange<Range>(
 	$scale: Partial<ScaleContinuousNumeric<Range, any, any>> | null | undefined
 ): Range[] | null;
 // Implementation:
