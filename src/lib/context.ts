@@ -27,9 +27,7 @@ export type LayerCakeContext<
 	/**
 	 * The calculated scale for the given axis.
 	 */
-	[axis in Axis as `${axis}Scale`]: SvelteStore<
-		Callable<GenericScalingFunction> & Partial<GenericScalingFunction>
-	>;
+	[axis in Axis as `${axis}Scale`]: SvelteStore<Callable<GenericScalingFunction>>;
 } & {
 	/**
 	 * @deprecated Use `$xScale.range()` directly or use `getRange($xScale)`
