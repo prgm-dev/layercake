@@ -7,7 +7,7 @@ export function getRange<Range>(
 	$scale: Partial<ScaleContinuousNumeric<Range, any, any>> | null | undefined
 ): Range[] | null;
 // Implementation:
-export default function getRange<Range>(
+export function getRange<Range>(
 	$scale: Partial<ScaleContinuousNumeric<Range, any, any>> | undefined | null
 ): Range[] | null {
 	if (hasRange($scale)) {
@@ -25,3 +25,5 @@ export function hasRange<Range>(
 ): $scale is ScaleContinuousNumeric<Range, any, any> {
 	return !!$scale?.range && typeof $scale.range === 'function';
 }
+
+export default getRange;
